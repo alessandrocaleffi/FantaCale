@@ -54,7 +54,7 @@ Installation
 
 Clone the repository
 
-git clone [https://github.com/yourusername/fantacale-analyzer.git](https://github.com/yourusername/fantacale-analyzer.git)
+git clone [https://github.com/yourusername/fantacale-analyzer.git](https://github.com/alessandrocaleffi/fantacale-analyzer.git)
 cd fantacale-analyzer
 
 
