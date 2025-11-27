@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inserisci Giocatore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Inserisci Nuovo Calciatore</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nome</label>
+                                <input type="text" name="Nome" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Squadra</label>
+                                <input type="text" name="Squadra" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Ruolo (P, D, C, A)</label>
+                                <select name="Ruolo" class="form-select" required>
+                                    <option value="P">P</option>
+                                    <option value="D">D</option>
+                                    <option value="C">C</option>
+                                    <option value="A">A</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">Dettaglio Ruolo (es. Terzino, Ala)</label>
+                                <input type="text" name="Ruolo_Dettaglio" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Media Voto</label>
+                                <input type="number" step="0.01" name="Media_Voto" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">FantaMedia</label>
+                                <input type="number" step="0.01" name="FantaMedia" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">FM Prevista</label>
+                                <input type="number" step="0.01" name="FantaMedia_Prevista" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Prezzo</label>
+                                <input type="number" name="Prezzo" class="form-control">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Titolarità (%)</label>
+                                <input type="number" name="Titolarita" class="form-control" max="100">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 p-3 bg-light rounded border">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="Tiratore_CP" value="1">
+                                <label class="form-check-label">⚽ Tiratore Calci Piazzati</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="Obiettivo" value="1">
+                                <label class="form-check-label">🎯 Obiettivo di Mercato</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="Fuori_lista" value="1">
+                                <label class="form-check-label text-danger">🚫 Fuori Lista</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Note</label>
+                            <textarea name="Nota" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('main.index') }}" class="btn btn-secondary me-md-2">Annulla</a>
+                            <button type="submit" class="btn btn-success">Salva Giocatore</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FantaCale Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sort-icon { font-size: 0.8em; margin-left: 5px; opacity: 0.5; }
+        .sort-active { opacity: 1; color: #ffc107; }
+        .clickable-row:hover { background-color: #f8f9fa; }
+        .table-sm td, .table-sm th { vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#"><i class="fas fa-futbol"></i> FantaCale Analyzer</a>
+        <div class="d-flex">
+            <a href="{{ url_for('main.insert') }}" class="btn btn-success me-2"><i class="fas fa-plus"></i> Nuovo</a>
+            <a href="{{ url_for('main.search_page') }}" class="btn btn-light"><i class="fas fa-search"></i> Ricerca Avanzata</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid px-4">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="btn-group btn-group-sm">
+                <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">Tutti</a>
+                <a href="{{ url_for('main.index', solo_obiettivi=1) }}" class="btn btn-outline-warning">🎯 Solo Obiettivi</a>
+                <a href="{{ url_for('main.index', solo_tiratori=1) }}" class="btn btn-outline-info">⚽ Tiratori</a>
+                <a href="{{ url_for('main.index', solo_fuori_lista=1) }}" class="btn btn-outline-danger">🚫 Fuori Lista</a>
+            </div>
+            
+            <!-- <div class="text-muted small">
+                <strong>Statistiche:</strong> 
+                Giocatori: {{ stats.total }} | 
+                Obiettivi: {{ stats.obiettivi }} | 
+                Budget Stimato: {{ stats.budget_speso }}
+            </div> -->
+
+            <a href="{{ url_for('main.index', reset_sort=1) }}" class="btn btn-sm btn-dark">
+                <i class="fas fa-undo"></i> Reset Ordinamento
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm table-bordered mb-0">
+                <thead class="table-dark text-nowrap">
+                    <tr>
+                        {% macro sort_header(field, label) %}
+                        <th>
+                            <a href="{{ url_for('main.index', sort=field) }}" class="text-white text-decoration-none d-block">
+                                {{ label }}
+                                {% set active_sort = namespace(found=false, dir='') %}
+                                {% for s_field, s_dir in current_sort %}
+                                    {% if s_field == field %}
+                                        {% set active_sort.found = true %}
+                                        {% set active_sort.dir = s_dir %}
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                <i class="fas fa-sort{{ '-up' if active_sort.dir == 'ASC' else '-down' if active_sort.dir == 'DESC' else '' }} sort-icon {{ 'sort-active' if active_sort.found else '' }}"></i>
+                            </a>
+                        </th>
+                        {% endmacro %}
+
+                        {{ sort_header('Obiettivo', '🎯') }}
+                        {{ sort_header('Nome', 'Nome') }}
+                        {{ sort_header('Squadra', 'Squadra') }}
+                        {{ sort_header('Ruolo', 'Ruolo') }}
+                        {{ sort_header('Ruolo_Dettaglio', 'R Dettaglio') }}
+                        {{ sort_header('Media_Voto', 'MediaVoto') }}
+                        {{ sort_header('FantaMedia', 'FantaMedia') }}
+                        {{ sort_header('FantaMedia_Prevista', 'FM Prevista') }}
+                        {{ sort_header('Titolarita', 'Titolarità%') }}
+                        {{ sort_header('Prezzo', 'Prezzo') }}
+                        <th class="text-center">Tiratore</th>
+                        <th class="text-center">FuoriLista</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in players %}
+                    <tr class="{{ 'table-warning' if p.Obiettivo else '' }} {{ 'table-danger' if p.Fuori_lista else '' }}">
+                        <td class="text-center">
+                            <div class="form-check d-flex justify-content-center">
+                                <input class="form-check-input objective-toggle" type="checkbox" 
+                                       data-id="{{ p.ID }}" 
+                                       {{ 'checked' if p.Obiettivo else '' }}>
+                            </div>
+                        </td>
+                        
+                        <td class="fw-bold">
+                            <a href="{{ url_for('main.detail', player_id=p.ID) }}" class="text-decoration-none text-dark">
+                                {{ p.Nome }}
+                            </a>
+                        </td>
+                        
+                        <td>{{ p.Squadra }}</td>
+                        <td><span class="badge bg-{{ 'warning' if p.Ruolo=='P' else 'success' if p.Ruolo=='D' else 'primary' if p.Ruolo=='C' else 'danger' }}">{{ p.Ruolo }}</span></td>
+                        <td class="small text-muted">{{ p.Ruolo_Dettaglio }}</td>
+                        
+                        <td class="{{ 'fw-bold text-success' if p.Media_Voto and p.Media_Voto > 6.0 else '' }}">
+                            {{ p.Media_Voto or '-' }}
+                        </td>
+                        <td class="{{ 'fw-bold text-primary' if p.FantaMedia and p.FantaMedia > 6.5 else '' }}">
+                            {{ p.FantaMedia or '-' }}
+                        </td>
+                        <td>{{ p.FantaMedia_Prevista or '-' }}</td>
+                        
+                        <td>
+                            {% if p.Titolarita %}
+                            <div class="progress" style="height: 5px; width: 50px;">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: {{p.Titolarita }}%"></div>
+                            </div>
+                            <span class="small">{{ p.Titolarita }}%</span>
+                            {% else %}-{% endif %}
+                        </td>
+                        
+                        <td class="fw-bold">{{ p.Prezzo or 0 }}</td>
+                        
+                        <td class="text-center text-success">{{ '⚽' if p.Tiratore_CP else '' }}</td>
+                        <td class="text-center text-danger">{{ '🚫' if p.Fuori_lista else '' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="12" class="text-center py-4">Nessun giocatore trovato.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.objective-toggle').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const playerId = this.getAttribute('data-id');
+            const status = this.checked ? 1 : 0;
+            const row = this.closest('tr');
+
+            fetch('/api/toggle_objective', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: playerId, status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    // Feedback visivo immediato: cambia colore riga
+                    if(status === 1) row.classList.add('table-warning');
+                    else row.classList.remove('table-warning');
+                } else {
+                    alert('Errore durante il salvataggio.');
+                    this.checked = !this.checked; // Revert
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Errore di connessione.');
+                this.checked = !this.checked;
+            });
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

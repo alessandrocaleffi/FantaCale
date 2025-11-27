@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettaglio {{ player.Nome }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-primary mb-4">
+    <div class="container">
+        <a href="{{ url_for('main.index') }}" class="navbar-brand">
+            <i class="fas fa-arrow-left"></i> Torna alla Dashboard
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0 text-primary">{{ player.Nome }} <span class="text-muted fs-6">(ID: {{ player.ID }})</span></h3>
+                    <span class="badge bg-{{ 'warning' if player.Ruolo=='P' else 'success' if player.Ruolo=='D' else 'primary' if player.Ruolo=='C' else 'danger' }} fs-5">
+                        {{ player.Ruolo }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Nome</label>
+                                <input type="text" name="Nome" class="form-control" value="{{ player.Nome }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Squadra</label>
+                                <input type="text" name="Squadra" class="form-control" value="{{ player.Squadra }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Ruolo</label>
+                                <select name="Ruolo" class="form-select">
+                                    <option value="P" {{ 'selected' if player.Ruolo == 'P' }}>Portiere</option>
+                                    <option value="D" {{ 'selected' if player.Ruolo == 'D' }}>Difensore</option>
+                                    <option value="C" {{ 'selected' if player.Ruolo == 'C' }}>Centrocampista</option>
+                                    <option value="A" {{ 'selected' if player.Ruolo == 'A' }}>Attaccante</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">Dettaglio Ruolo</label>
+                                <input type="text" name="Ruolo_Dettaglio" class="form-control" value="{{ player.Ruolo_Dettaglio }}">
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Media Voto</label>
+                                <input type="number" step="0.01" name="Media_Voto" class="form-control" value="{{ player.Media_Voto }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">FantaMedia</label>
+                                <input type="number" step="0.01" name="FantaMedia" class="form-control" value="{{ player.FantaMedia }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">FM Prevista</label>
+                                <input type="number" step="0.01" name="FantaMedia_Prevista" class="form-control" value="{{ player.FantaMedia_Prevista }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-success fw-bold">Prezzo</label>
+                                <input type="number" name="Prezzo" class="form-control border-success" value="{{ player.Prezzo }}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                             <div class="col-md-3">
+                                <label class="form-label">Titolarità (%)</label>
+                                <input type="number" name="Titolarita" class="form-control" value="{{ player.Titolarita }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 p-3 bg-light rounded border">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="Tiratore_CP" value="1" {{ 'checked' if player.Tiratore_CP }}>
+                                <label class="form-check-label">Tiratore CP</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="Obiettivo" value="1" {{ 'checked' if player.Obiettivo }}>
+                                <label class="form-check-label">Obiettivo</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="Fuori_lista" value="1" {{ 'checked' if player.Fuori_lista }}>
+                                <label class="form-check-label text-danger">Fuori Lista</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Note</label>
+                            <textarea name="Nota" class="form-control" rows="4">{{ player.Nota }}</textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" name="delete" value="1" class="btn btn-outline-danger" onclick="return confirm('Sei sicuro di voler eliminare questo giocatore?');">
+                                <i class="fas fa-trash"></i> Elimina
+                            </button>
+
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Salva Modifiche
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

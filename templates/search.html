@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ricerca Avanzata - FantaCale Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a href="{{ url_for('main.index') }}" class="navbar-brand">
+                <i class="fas fa-arrow-left"></i> Torna alla Dashboard
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Form Ricerca -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5><i class="fas fa-filter"></i> Filtri Avanzati</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label class="form-label">Nome</label>
+                                <input type="text" class="form-control" name="Nome" placeholder="Cerca per nome...">
+                                <small class="text-muted">Ricerca parziale</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Squadra</label>
+                                <input type="text" class="form-control" name="Squadra" placeholder="es. Napoli">
+                                <small class="text-muted">Ricerca parziale</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Ruolo</label>
+                                <select class="form-select" name="Ruolo">
+                                    <option value="">Tutti</option>
+                                    <option value="P">P - Portiere</option>
+                                    <option value="D">D - Difensore</option>
+                                    <option value="C">C - Centrocampista</option>
+                                    <option value="A">A - Attaccante</option>
+                                </select>
+                            </div>
+
+                            <hr>
+
+                            <div class="mb-3">
+                                <label class="form-label">Prezzo</label>
+                                <div class="input-group">
+                                    <select class="form-select" name="Prezzo_op" style="max-width: 80px;">
+                                        <option value="<">&lt;</option>
+                                        <option value="<=">&lt;=</option>
+                                        <option value="=">=</option>
+                                        <option value=">=">&gt;=</option>
+                                        <option value=">">&gt;</option>
+                                    </select>
+                                    <input type="number" class="form-control" name="Prezzo_val" placeholder="es. 15">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Titolarità</label>
+                                <div class="input-group">
+                                    <select class="form-select" name="Titolarita_op" style="max-width: 80px;">
+                                        <option value="<">&lt;</option>
+                                        <option value="<=">&lt;=</option>
+                                        <option value="=">=</option>
+                                        <option value=">=">&gt;=</option>
+                                        <option value=">">&gt;</option>
+                                    </select>
+                                    <input type="number" class="form-control" name="Titolarita_val" placeholder="es. 80">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">FantaMedia</label>
+                                <div class="input-group">
+                                    <select class="form-select" name="FantaMedia_op" style="max-width: 80px;">
+                                        <option value="<">&lt;</option>
+                                        <option value="<=">&lt;=</option>
+                                        <option value="=">=</option>
+                                        <option value=">=">&gt;=</option>
+                                        <option value=">">&gt;</option>
+                                    </select>
+                                    <input type="number" step="0.01" class="form-control" name="FantaMedia_val" placeholder="es. 7.00">
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="Tiratore_CP" id="search_tiratore">
+                                    <label class="form-check-label" for="search_tiratore">
+                                        Solo Tiratori CP
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="Fuori_lista" id="search_fuori">
+                                    <label class="form-check-label" for="search_fuori">
+                                        Solo Fuori Lista
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="Obiettivo" id="search_obiettivo">
+                                    <label class="form-check-label" for="search_obiettivo">
+                                        Solo Obiettivi
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Cerca
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risultati -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="fas fa-list"></i> Risultati 
+                            {% if results %}
+                                <span class="badge bg-light text-dark">{{ results|length }}</span>
+                            {% endif %}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if results %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover table-sm">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Squadra</th>
+                                            <th>Ruolo</th>
+                                            <th>FantaMedia</th>
+                                            <th>Titolarità</th>
+                                            <th>Prezzo</th>
+                                            <th>Tiratore</th>
+                                            <th>Azioni</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for player in results %}
+                                        <tr>
+                                            <td><strong>{{ player.Nome }}</strong></td>
+                                            <td>{{ player.Squadra or '-' }}</td>
+                                            <td><span class="badge bg-secondary">{{ player.Ruolo or '-' }}</span></td>
+                                            <td>{{ "%.2f"|format(player.FantaMedia) if player.FantaMedia else '-' }}</td>
+                                            <td>{{ player.Titolarita if player.Titolarita is not none else '-' }}%</td>
+                                            <td><span class="badge bg-success">{{ player.Prezzo if player.Prezzo is not none else '-' }}</span></td>
+                                            <td class="text-center">
+                                                {% if player.Tiratore_CP == 1 %}
+                                                    <i class="fas fa-futbol text-warning"></i>
+                                                {% else %}
+                                                    <i class="fas fa-times text-muted"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('main.detail', player_id=player.ID) }}" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-eye"></i> Dettagli
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info" role="alert">
+                                <i class="fas fa-info-circle"></i> 
+                                Compila i filtri e clicca su "Cerca" per visualizzare i risultati.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if results %}
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6>Statistiche Risultati:</h6>
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="p-3 bg-light rounded">
+                                    <strong>Totale</strong><br>
+                                    <span class="fs-4 text-primary">{{ results|length }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 bg-light rounded">
+                                    <strong>Media Prezzo</strong><br>
+                                    <span class="fs-4 text-success">
+                                        {% set avg_price = results|selectattr('Prezzo', 'number')|map(attribute='Prezzo')|list %}
+                                        {% if avg_price %}
+                                            {{ "%.1f"|format(avg_price|sum / avg_price|length) }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 bg-light rounded">
+                                    <strong>Media FM</strong><br>
+                                    <span class="fs-4 text-warning">
+                                        {% set avg_fm = results|selectattr('FantaMedia', 'number')|map(attribute='FantaMedia')|list %}
+                                        {% if avg_fm %}
+                                            {{ "%.2f"|format(avg_fm|sum / avg_fm|length) }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 bg-light rounded">
+                                    <strong>Tiratori CP</strong><br>
+                                    <span class="fs-4 text-info">
+                                        {{ results|selectattr('Tiratore_CP', 'equalto', 1)|list|length }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
